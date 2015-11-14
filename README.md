@@ -1,12 +1,12 @@
 ﻿# DeadReckoning
 Dead reckoning application for Redshift Robotics 5619
 
-controllerModule:
+Class controllerModule:
 
   	Example implementation of other classes.
 
 
-InstructionSet:
+Class InstructionSet:
 
   	Used as an extension to arrayList to hold instructions.
 
@@ -26,7 +26,7 @@ Methods:
 
 
 
-Instruction:
+Class Instruction:
 
 	Individual instruction object that holds movement data.
 
@@ -44,7 +44,7 @@ Methods:
 
 
 
-globalInfoPacket:
+Class globalInfoPacket:
 
 	Information about the motors and the wheels. Currently only supports a single wheel type.
 
