@@ -34,6 +34,11 @@ public class globalInfoPacket {
     public boolean exportPacket(){
         if(uncommittedChanges) {return false;}
         if(encoderCPR == 0 && gearRatio == 0.0f && wheelCircumference == 0.0f){return false;}
+        if(outFile.exists()) {
+            if(!outFile.delete()) {
+                return false;
+            }
+        }
         if(output == null)
         {
             //Attempt to assume File permissions
@@ -46,6 +51,7 @@ public class globalInfoPacket {
         output.println(sessionHash);
         output.println(encoderCPR); output.println(gearRatio); output.println(wheelCircumference);
         output.close();
+        output = null;
         return true;
     }
 
