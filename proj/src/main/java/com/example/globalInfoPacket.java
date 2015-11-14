@@ -11,13 +11,14 @@ import java.util.Random;
  * Created by Noah Rose-Ledesma on 11/10/2015.
  */
 public class globalInfoPacket {
-    protected
+    private
     boolean uncommitedChanges;
     int sessionHash, encoderCPR;
     float gearRatio, wheelCurcumfrance;
+    static
     Random ran;
     PrintWriter output;
-    public File outFile = new File("Global.packet");
+    File outFile = new File("Global.packet");
     globalInfoPacket()
     {
         //Init out values
