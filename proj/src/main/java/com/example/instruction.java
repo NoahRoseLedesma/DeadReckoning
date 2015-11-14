@@ -13,13 +13,13 @@ public class instruction {
     static
     PrintWriter output;
     public File outFile = new File("Instruction.packet");
-    instruction(int motorBLDest, int motorBRDest, int motorFLDest, int motorFRDest){
-        setValues(motorBLDest, motorBRDest, motorFLDest, motorFRDest);
+    instruction(int motorFRDest, int motorFLDest, int motorBRDest, int motorBLDest){
+        setValues(motorFRDest, motorFLDest, motorBRDest, motorBLDest);
     }
     instruction(){
 
     }
-    public void setValues(int motorBLDest, int motorBRDest, int motorFLDest, int motorFRDest)
+    public void setValues(int motorFRDest, int motorFLDest, int motorBRDest, int motorBLDest)
     {
         this.motorBLDest = motorBLDest; if(motorBLDest <= 0){this.motorBL = false;}
         this.motorBRDest = motorBRDest; if(motorBRDest <= 0){this.motorBR = false;}
