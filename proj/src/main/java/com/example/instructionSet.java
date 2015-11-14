@@ -44,9 +44,12 @@ public class instructionSet<E extends instruction> extends ArrayList<E>{
             try{
                 //Primitives cant be converted to string correctly. Converted to objects first
                 //FR, FL, BR, BL
+
                 output.write(Boolean.toString(currentInstruction.motorFR)); output.newLine(); output.write(Integer.toString(currentInstruction.motorFRDest)); output.newLine(); output.write(Boolean.toString(currentInstruction.motorFL)); output.newLine(); output.write(Integer.toString(currentInstruction.motorFLDest)); output.newLine(); output.write(Boolean.toString(currentInstruction.motorBR)); output.newLine(); output.write(Integer.toString(currentInstruction.motorBRDest)); output.newLine(); output.write(Boolean.toString(currentInstruction.motorBL)); output.newLine(); output.write(Integer.toString(currentInstruction.motorBLDest)); output.newLine();
+
                 //There is no way to tell if the itt is refering to the last item of the arraylist.
                 //Therefore a new line is written to the end of the file. The other end will have to handle this quirk
+
             } catch (IOException io){
                 System.out.println("Could not write to the filesystem");
             }
