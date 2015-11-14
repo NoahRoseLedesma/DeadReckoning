@@ -1,8 +1,5 @@
 package com.example;
 
-import java.io.File;
-import java.io.PrintWriter;
-
 /**
  * Created by Noah Rose-Ledesma on 11/12/2015.
  */
@@ -10,9 +7,6 @@ public class instruction {
     protected
     boolean motorFR = true, motorBR = true, motorFL = true, motorBL= true, hasSet = false; // Use this motor? and Have the values been init
     int motorFRDest, motorBRDest, motorFLDest, motorBLDest; // Distance to travel in mm
-    static
-    PrintWriter output;
-    public File outFile = new File("Instruction.packet");
     instruction(int motorFRDest, int motorFLDest, int motorBRDest, int motorBLDest){
         setValues(motorFRDest, motorFLDest, motorBRDest, motorBLDest);
     }

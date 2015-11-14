@@ -9,11 +9,9 @@ import java.util.Random;
  * Created by Noah Rose-Ledesma on 11/10/2015.
  */
 public class globalInfoPacket {
-    private
     boolean uncommittedChanges;
     int sessionHash, encoderCPR;
     float gearRatio, wheelCircumference;
-    static
     Random ran;
     PrintWriter output;
     File outFile = new File("Global.packet");
@@ -56,8 +54,7 @@ public class globalInfoPacket {
     }
 
     public void setEncoderCPR(int cpr){encoderCPR = cpr; uncommittedChanges = true;}
-    public void setWheelCircumference(int cir){
-        wheelCircumference = cir; uncommittedChanges = true;}
+    public void setWheelCircumference(int cir){wheelCircumference = cir; uncommittedChanges = true;}
     public void setGearRatio(int gr){gearRatio = gr; uncommittedChanges = true;}
 
 }
