@@ -17,7 +17,7 @@ public class instruction {
         setValues(motorFRDest, motorFLDest, motorBRDest, motorBLDest);
     }
     instruction(){
-
+        // Empty constructor to allow class to be instantiated without setting values
     }
     public void setValues(int motorFRDest, int motorFLDest, int motorBRDest, int motorBLDest)
     {

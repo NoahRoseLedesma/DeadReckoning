@@ -7,26 +7,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
-import com.example.instruction;
 
 /**
  * Created by Noah Rose-Ledesma on 11/14/2015.
  */
 public class instructionSet<E extends instruction> extends ArrayList<E>{
-    ArrayList<com.example.instruction> instructionSet= new ArrayList();
     BufferedWriter output;
     File outFile = new File("Instructions.packet");
     AtomicReference<globalInfoPacket> mainPacket;
 
-    instructionSet(AtomicReference mainPacketAtomicRefrence){
+    instructionSet(AtomicReference<globalInfoPacket> mainPacketAtomicReference){
 
         super();
-        this.mainPacket = mainPacketAtomicRefrence;
+        this.mainPacket = mainPacketAtomicReference;
     }
     void exportInstructions()
     {
         Iterator<E> it = this.iterator();
-        //Iterator<com.example.instruction> it = instructionSet.iterator();
         try{
             //Delete the old instruction packet. If you cant delete it, throw an IOException. I know its cheap, but its still technically an IO Error
             if(outFile.exists()){

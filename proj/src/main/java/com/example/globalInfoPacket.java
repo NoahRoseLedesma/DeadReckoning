@@ -10,9 +10,9 @@ import java.util.Random;
  */
 public class globalInfoPacket {
     private
-    boolean uncommitedChanges;
+    boolean uncommittedChanges;
     int sessionHash, encoderCPR;
-    float gearRatio, wheelCurcumfrance;
+    float gearRatio, wheelCircumference;
     static
     Random ran;
     PrintWriter output;
@@ -28,12 +28,12 @@ public class globalInfoPacket {
     public void commitChanges()
     {
         sessionHash = ran.nextInt();
-        uncommitedChanges = false;
+        uncommittedChanges = false;
     }
 
     public boolean exportPacket(){
-        if(uncommitedChanges) {return false;}
-        if(encoderCPR == 0 && gearRatio == 0.0f && wheelCurcumfrance == 0.0f){return false;}
+        if(uncommittedChanges) {return false;}
+        if(encoderCPR == 0 && gearRatio == 0.0f && wheelCircumference == 0.0f){return false;}
         if(output == null)
         {
             //Attempt to assume File permissions
@@ -44,13 +44,14 @@ public class globalInfoPacket {
             }
         }
         output.println(sessionHash);
-        output.println(encoderCPR); output.println(gearRatio); output.println(wheelCurcumfrance);
+        output.println(encoderCPR); output.println(gearRatio); output.println(wheelCircumference);
         output.close();
         return true;
     }
 
-    public void setEncoderCPR(int cpr){encoderCPR = cpr; uncommitedChanges = true;}
-    public void setWheelCurcumfrance(int cir){wheelCurcumfrance = cir; uncommitedChanges = true;}
-    public void setGearRatio(int gr){gearRatio = gr; uncommitedChanges = true;}
+    public void setEncoderCPR(int cpr){encoderCPR = cpr; uncommittedChanges = true;}
+    public void setWheelCircumference(int cir){
+        wheelCircumference = cir; uncommittedChanges = true;}
+    public void setGearRatio(int gr){gearRatio = gr; uncommittedChanges = true;}
 
 }
