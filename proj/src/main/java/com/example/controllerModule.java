@@ -1,24 +1,20 @@
 package com.example;
-import com.example.globalInfoPacket;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import com.example.instruction;
-import com.sun.org.apache.bcel.internal.generic.Instruction;
+import com.example.globalInfoPacket;
 
 // For now all classes will be in this file. Im so sorry
 public class controllerModule {
     static ArrayList<instruction> instructionSet= new ArrayList();
     static BufferedWriter output;
     static File outFile = new File("Instructions.packet");
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         System.out.println("Absolute Horseshit 2.0");
         globalInfoPacket mainPacket = new globalInfoPacket();
         mainPacket.setEncoderCPR(12);
