@@ -9,9 +9,9 @@ import java.util.Random;
  * Created by Noah Rose-Ledesma on 11/10/2015.
  */
 public class globalInfoPacket {
-    boolean uncommittedChanges;
+    public boolean uncommittedChanges;
     public int sessionHash, encoderCPR;
-    float gearRatio, wheelCircumference;
+    public float gearRatio, wheelCircumference;
     Random ran;
     PrintWriter output;
     File outFile = new File("Global.packet");

@@ -40,7 +40,10 @@ public class instructionSet<E extends instruction> extends ArrayList<E>{
         while (it.hasNext())
         {
             instruction currentInstruction = it.next();
-            if(!currentInstruction.hasSet){return;}
+            if(!currentInstruction.hasSet){
+
+                return;
+            }
             try{
                 //Primitives cant be converted to string correctly. Converted to objects first
                 //FR, FL, BR, BL
@@ -55,5 +58,7 @@ public class instructionSet<E extends instruction> extends ArrayList<E>{
             }
         }
         try{output.close();}catch (IOException io){System.out.println("Could not close filewriter");}
+
+        //TODO: Add single big try, a single big catch. Then add a finally clause to cleanly pick up the buffers.
     }
 }

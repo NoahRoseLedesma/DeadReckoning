@@ -65,6 +65,7 @@ public class packetReader {
         if(input != null){ input = null;}
         globalInfoPacket returnPacket = new globalInfoPacket();
         try{
+            // TODO: Read write parsing, not line by line.
             input = new BufferedReader(new FileReader(globalPacket.getAbsoluteFile()));
             String readLine;
             // We will set the globalInfoPacket values manually. Don't do this at home kids
