@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Created by Noah Rose-Ledesma on 11/14/2015.
  * Packet reading module.
+ * TODO: Use serialize
  */
 public class packetReader {
     File instructionPacket;

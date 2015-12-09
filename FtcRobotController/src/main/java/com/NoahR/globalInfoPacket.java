@@ -7,6 +7,7 @@ import java.util.Random;
 
 /**
  * Created by Noah Rose-Ledesma on 11/10/2015.
+ * TODO: Use serialize
  */
 public class globalInfoPacket {
     public boolean uncommittedChanges;

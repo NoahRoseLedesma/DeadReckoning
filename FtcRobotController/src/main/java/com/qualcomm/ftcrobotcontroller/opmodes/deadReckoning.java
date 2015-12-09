@@ -6,108 +6,73 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.NoahR.*;
 import com.qualcomm.robotcore.robocol.Telemetry;
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Iterator;
 
 /**
  * Created by Noah Rose-Ledesma on 11/17/2015.
  * why is this yellow? Gosh dangit android studio.
+ * Global TODO: unity of purpose
  */
 public class deadReckoning extends OpMode{
-    boolean loadedPacket; //Use these?
-    boolean loadedGlobalPacket; // ^
+    private boolean debugBuild = true; // Modify this to enable or disable debug printing
+    boolean instructionInProgress;
     DcMotorController motorController, motorController2;
     DcMotor motorFR, motorFL, motorBR, motorBL;
-    // Backend stuff
-    instructionSet<instruction> instructions;
     globalInfoPacket globalInfoPacket;
-    packetReader packetRead;
-    Iterator<instruction> it;
     instruction currentInstruction;
-    boolean instructionInProgress;
+    instructionSet<instruction> instructions;
     int instructionCount;
+    Iterator<instruction> it;
+    packetReader packetRead;
 
 
     @Override
     public void init(){
-        /*
-        globalInfoPacket = new globalInfoPacket();
-        globalInfoPacket.sessionHash = 123;
-        instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
-        instructions.add(new instruction(1, 2, 3, 4));
-        instructions.add(new instruction(4,3,2,1));
-        instructions.outFile = new File(hardwareMap.appContext.getFilesDir().getAbsoluteFile(), "instruction.packet");
-        instructions.exportInstructions();
-        instructions = null;
-        telemetry.addData("1", hardwareMap.appContext.getFilesDir().getAbsolutePath());
-        packetRead = new packetReader(new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new AtomicReference<Telemetry>(telemetry));
-        globalInfoPacket = packetRead.getGlobalPacket();
-        instructions = packetRead.getInstructionPacket();
-        telemetry.addData("2", instructions.get(0).motorFRDest + " " + instructions.get(1).motorFRDest);
-        */
-        //This demonstrates writing instructions to the filesystem. And than reading them into the instructions object.
-
-        //Hardware config.
-        motorController = hardwareMap.dcMotorController.get("Motor Controller 1");
-        motorController2 = hardwareMap.dcMotorController.get("Motor Controller 2");
-        motorFR = hardwareMap.dcMotor.get("Motor FR");
-        motorFL = hardwareMap.dcMotor.get("Motor FL");
-        motorBR = hardwareMap.dcMotor.get("Motor BR");
-        motorBL = hardwareMap.dcMotor.get("Motor BL");
-
+        mapHardware();
     }
 
     @Override
     public void loop()
     {
-        if(motorFR.getCurrentPosition() >= motorFR.getTargetPosition() && motorFL.getCurrentPosition() >= motorFL.getTargetPosition() && motorBR.getCurrentPosition() >= motorBR.getTargetPosition() && motorBL.getCurrentPosition() >= motorFL.getTargetPosition()){
+        if(hasReachedTarget()){
             instructionInProgress = false;
         }
         if(!instructionInProgress && it.hasNext())
         {
-            currentInstruction = it.next();
-            instructionInProgress = true;
-            instructionCount++;
-            telemetry.addData("1", instructionCount);
-            runInstruction(currentInstruction);
+            runInstruction();
         }
     }
 
     @Override
-    public void start(){
-        // Load our packets
-        globalInfoPacket = new globalInfoPacket();
-        globalInfoPacket.sessionHash = 123;
-        instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
-        instructions.add(new instruction(1, 2, 3, 4));
-        instructions.add(new instruction(4,3,2,1));
-        instructions.outFile = new File(hardwareMap.appContext.getFilesDir().getAbsoluteFile(), "instruction.packet");
-        instructions.exportInstructions();
-        instructions = null;
-        telemetry.addData("1", hardwareMap.appContext.getFilesDir().getAbsolutePath());
+    public void start()
+    {
         packetRead = new packetReader(new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new AtomicReference<Telemetry>(telemetry));
-        globalInfoPacket = packetRead.getGlobalPacket();
-        instructions = packetRead.getInstructionPacket();
-        telemetry.addData("2", instructions.get(0).motorFRDest + " " + instructions.get(1).motorFRDest);
-        // Emulating the activity side.
-        globalInfoPacket = packetRead.getGlobalPacket();
-        if(instructions == null || globalInfoPacket == null) {
 
-            // Something is broken, handle it.
+        globalInfoPacket = packetRead.getGlobalPacket();
+
+        instructions = packetRead.getInstructionPacket();
+
+        if(instructions == null || globalInfoPacket == null) {
+            stop(); // Does this even work?
+            return;
         }
-        // Create our it
+
         it = instructions.iterator();
         if(!it.hasNext()){
-            // No instructions! Handle this error.
+            stop();
+            return;
         }
-        currentInstruction = it.next();
-        // Run the first instruction
+        runInstruction();
+    }
+
+
+    void runInstruction(){
+        instruction instruction = it.next();
         instructionInProgress = true;
         instructionCount++;
-        telemetry.addData("1", instructionCount);
-        runInstruction(currentInstruction);
-    }
-    void runInstruction(instruction instruction){
+        debugTelemetry("1", Integer.toString(instructionCount));
         // Reset encoders
         motorFR.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
         motorFL.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
@@ -141,5 +106,50 @@ public class deadReckoning extends OpMode{
         }
         return (int)(globalInfoPacket.encoderCPR * (distance / globalInfoPacket.wheelCircumference) * globalInfoPacket.gearRatio);
     }
+    private void mapHardware()
+    {
+        motorController = hardwareMap.dcMotorController.get("Motor Controller 1");
+        motorController2 = hardwareMap.dcMotorController.get("Motor Controller 2");
+        motorFR = hardwareMap.dcMotor.get("Motor FR");
+        motorFL = hardwareMap.dcMotor.get("Motor FL");
+        motorBR = hardwareMap.dcMotor.get("Motor BR");
+        motorBL = hardwareMap.dcMotor.get("Motor BL");
+    }
+    private boolean hasReachedTarget(){
+        if(motorFR.getCurrentPosition() >= motorFR.getTargetPosition())
+        {
+            if(motorFL.getCurrentPosition() >= motorFL.getTargetPosition())
+            {
+                if(motorBR.getCurrentPosition() >= motorBR.getTargetPosition())
+                {
+                    if(motorBL.getCurrentPosition() >= motorFL.getTargetPosition())
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
+    void debugTelemetry(String id, String text)
+    {
+        if((id == null || text == null) && !debugBuild)
+        {
+            return;
+        }
+        telemetry.addData(id, text);
+    }
+    void emulateActivitySide()
+    {
+        globalInfoPacket = new globalInfoPacket();
+        globalInfoPacket.sessionHash = 123;
+        instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
+        instructions.add(new instruction(1, 2, 3, 4));
+        instructions.add(new instruction(4,3,2,1));
+        instructions.outFile = new File(hardwareMap.appContext.getFilesDir().getAbsoluteFile(), "instruction.packet");
+        instructions.exportInstructions();
+        instructions = null;
+        globalInfoPacket = null;
+    }
 }
