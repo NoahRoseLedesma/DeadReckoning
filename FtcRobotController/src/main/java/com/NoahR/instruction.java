@@ -1,17 +1,21 @@
 package com.NoahR;
 
+import java.io.Serializable;
+
 /**
  * Created by Noah Rose-Ledesma on 11/12/2015.
  */
-public class instruction {
+public class instruction implements Serializable{
     public
-    boolean motorFR = true, motorBR = true, motorFL = true, motorBL= true, hasSet = false; // Use this motor? and Have the values been init
+    boolean motorFR = true, motorBR = true, motorFL = true, motorBL= true;
+    transient boolean hasSet = false;
     public int motorFRDest, motorBRDest, motorFLDest, motorBLDest; // Distance to travel in mm
+
+    public instruction(){
+        // Empty so that method may be overloaded with initializer values
+    }
     public instruction(int motorFRDest, int motorFLDest, int motorBRDest, int motorBLDest){
         setValues(motorFRDest, motorFLDest, motorBRDest, motorBLDest);
-    }
-    public instruction(){
-        // Empty constructor to allow class to be instantiated without setting values
     }
     public void setValues(int motorFRDest, int motorFLDest, int motorBRDest, int motorBLDest)
     {

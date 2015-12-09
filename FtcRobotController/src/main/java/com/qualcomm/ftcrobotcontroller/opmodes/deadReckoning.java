@@ -6,24 +6,27 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.NoahR.*;
 import com.qualcomm.robotcore.robocol.Telemetry;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Iterator;
 
 /**
  * Created by Noah Rose-Ledesma on 11/17/2015.
- * why is this yellow? Gosh dangit android studio.
- * Global TODO: unity of purpose
+ * Opmode to be run to create deadReckoning opmodes. That is an awkward sentence, but you know what I mean.
  */
 public class deadReckoning extends OpMode{
-    private boolean debugBuild = true; // Modify this to enable or disable debug printing
+    boolean debugBuild = true; // Modify this to enable or disable debug printing
     boolean instructionInProgress;
+    int instructionCount;
     DcMotorController motorController, motorController2;
     DcMotor motorFR, motorFL, motorBR, motorBL;
     globalInfoPacket globalInfoPacket;
     instruction currentInstruction;
     instructionSet<instruction> instructions;
-    int instructionCount;
     Iterator<instruction> it;
     packetReader packetRead;
 
@@ -48,6 +51,8 @@ public class deadReckoning extends OpMode{
     @Override
     public void start()
     {
+        emulateActivitySide();
+
         packetRead = new packetReader(new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new AtomicReference<Telemetry>(telemetry));
 
         globalInfoPacket = packetRead.getGlobalPacket();
@@ -147,9 +152,45 @@ public class deadReckoning extends OpMode{
         instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
         instructions.add(new instruction(1, 2, 3, 4));
         instructions.add(new instruction(4,3,2,1));
-        instructions.outFile = new File(hardwareMap.appContext.getFilesDir().getAbsoluteFile(), "instruction.packet");
-        instructions.exportInstructions();
+        serializeInstructionSet(instructions);
         instructions = null;
         globalInfoPacket = null;
+    }
+
+    void serializeInstructionSet(instructionSet set)
+    {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile()+"instruction.packet");
+            ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
+            out.writeObject(set);
+            out.close();
+            fileOutputStream.close();
+        }
+        catch (IOException io){
+            stop();
+        }
+    }
+    instructionSet deserializeInstructionSet()
+    {
+        instructionSet desearializedInstructionSet;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile()+"instruction.packet");
+            ObjectInputStream in = new ObjectInputStream(fileInputStream);
+            desearializedInstructionSet = (instructionSet) in.readObject();
+            in.close();
+            fileInputStream.close();
+        }
+        catch (IOException io){
+            telemetry.addData("1", "IOError in deserialization");
+            stop();
+            desearializedInstructionSet = null;
+        }
+        catch (ClassNotFoundException baderror)
+        {
+            telemetry.addData("1", "ClassNotFoundException in deserialization");
+            stop();
+            desearializedInstructionSet = null;
+        }
+        return desearializedInstructionSet;
     }
 }

@@ -4,28 +4,33 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by Noah Rose-Ledesma on 11/14/2015.
  */
-public class instructionSet<E extends instruction> extends ArrayList<E>{
-    BufferedWriter output;
-    public File outFile = new File("Instructions.packet");
-    AtomicReference<globalInfoPacket> mainPacket;
+public class instructionSet<E extends instruction> extends ArrayList<E> implements Serializable{
+    transient BufferedWriter output;
+    globalInfoPacket globalInfoPacket;
+    transient AtomicReference<globalInfoPacket> mainPacket;
 
     public instructionSet(AtomicReference<globalInfoPacket> mainPacketAtomicReference){
 
         super();
         this.mainPacket = mainPacketAtomicReference;
+
     }
-    public void exportInstructions()
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException
+    {
+        globalInfoPacket = mainPacket.get();
+    }
+    /*public void exportInstructions()
     {
         Iterator<E> it = this.iterator();
         try{
-            //Delete the old instruction packet. If you cant delete it, throw an IOException. I know its cheap, but its still technically an IO Error
+            //Delete the old instruction packet.
             if(outFile.exists()){
                 if(!outFile.delete()) {
                     throw new IOException();
@@ -58,7 +63,5 @@ public class instructionSet<E extends instruction> extends ArrayList<E>{
             }
         }
         try{output.close();}catch (IOException io){System.out.println("Could not close filewriter");}
-
-        //TODO: Add single big try, a single big catch. Then add a finally clause to cleanly pick up the buffers.
-    }
+        */
 }
