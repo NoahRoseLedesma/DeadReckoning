@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.NoahR.*;
-import com.qualcomm.robotcore.robocol.Telemetry;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,7 +26,6 @@ public class deadReckoning extends OpMode{
     instruction currentInstruction;
     instructionSet<instruction> instructions;
     Iterator<instruction> it;
-    packetReader packetRead;
 
 
     @Override
@@ -53,11 +50,9 @@ public class deadReckoning extends OpMode{
     {
         emulateActivitySide();
 
-        packetRead = new packetReader(new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new File(hardwareMap.appContext.getFilesDir().getAbsolutePath(), "instruction.packet"), new AtomicReference<Telemetry>(telemetry));
+        globalInfoPacket = deserializeGlobalInfoPacket();
 
-        globalInfoPacket = packetRead.getGlobalPacket();
-
-        instructions = packetRead.getInstructionPacket();
+        instructions = deserializeInstructionSet();
 
         if(instructions == null || globalInfoPacket == null) {
             stop(); // Does this even work?
@@ -149,10 +144,14 @@ public class deadReckoning extends OpMode{
     {
         globalInfoPacket = new globalInfoPacket();
         globalInfoPacket.sessionHash = 123;
+        globalInfoPacket.encoderCPR = 1120;
+        globalInfoPacket.gearRatio = 1.0f;
+        globalInfoPacket.wheelCircumference = (float)(60 * Math.PI);
         instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
         instructions.add(new instruction(1, 2, 3, 4));
         instructions.add(new instruction(4,3,2,1));
         serializeInstructionSet(instructions);
+        serializeGlobalInfoPacket(globalInfoPacket);
         instructions = null;
         globalInfoPacket = null;
     }
@@ -170,13 +169,13 @@ public class deadReckoning extends OpMode{
             stop();
         }
     }
-    instructionSet deserializeInstructionSet()
+    instructionSet<instruction> deserializeInstructionSet()
     {
-        instructionSet desearializedInstructionSet;
+        instructionSet<instruction> desearializedInstructionSet;
         try {
             FileInputStream fileInputStream = new FileInputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile()+"instruction.packet");
             ObjectInputStream in = new ObjectInputStream(fileInputStream);
-            desearializedInstructionSet = (instructionSet) in.readObject();
+            desearializedInstructionSet = (instructionSet<instruction>) in.readObject();
             in.close();
             fileInputStream.close();
         }
@@ -192,5 +191,42 @@ public class deadReckoning extends OpMode{
             desearializedInstructionSet = null;
         }
         return desearializedInstructionSet;
+    }
+
+    void serializeGlobalInfoPacket(globalInfoPacket globalInfoPacket)
+    {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile()+"global.packet");
+            ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
+            out.writeObject(globalInfoPacket);
+            out.close();
+            fileOutputStream.close();
+        }
+        catch (IOException io){
+            stop();
+        }
+    }
+    globalInfoPacket deserializeGlobalInfoPacket()
+    {
+        globalInfoPacket desearializedGlobalInfoPacket;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile() + "global.packet");
+            ObjectInputStream in = new ObjectInputStream(fileInputStream);
+            desearializedGlobalInfoPacket = (globalInfoPacket) in.readObject();
+            in.close();
+            fileInputStream.close();
+        }
+        catch (IOException io){
+            telemetry.addData("1", "IOError in deserialization");
+            stop();
+            desearializedGlobalInfoPacket = null;
+        }
+        catch (ClassNotFoundException baderror)
+        {
+            telemetry.addData("1", "ClassNotFoundException in deserialization");
+            stop();
+            desearializedGlobalInfoPacket = null;
+        }
+        return desearializedGlobalInfoPacket;
     }
 }

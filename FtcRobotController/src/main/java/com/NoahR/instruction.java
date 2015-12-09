@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 /**
  * Created by Noah Rose-Ledesma on 11/12/2015.
+ * Holds a single instruction for four motors.
  */
 public class instruction implements Serializable{
     public
