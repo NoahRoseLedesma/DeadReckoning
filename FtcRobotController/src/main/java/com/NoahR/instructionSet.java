@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class instructionSet<E extends instruction> extends ArrayList<E> implements Serializable{
     transient BufferedWriter output;
-    globalInfoPacket globalInfoPacket;
+    transient globalInfoPacket globalInfoPacket;
     transient AtomicReference<globalInfoPacket> mainPacket;
 
     public instructionSet(AtomicReference<globalInfoPacket> mainPacketAtomicReference){

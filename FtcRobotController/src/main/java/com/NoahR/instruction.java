@@ -7,7 +7,6 @@ import java.io.Serializable;
  * Holds a single instruction for four motors.
  */
 public class instruction implements Serializable{
-    public
     boolean motorFR = true, motorBR = true, motorFL = true, motorBL= true;
     transient boolean hasSet = false;
     public int motorFRDest, motorBRDest, motorFLDest, motorBLDest; // Distance to travel in mm
