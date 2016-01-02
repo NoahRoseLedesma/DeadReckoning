@@ -43,6 +43,7 @@ import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -71,8 +72,13 @@ import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class FtcRobotControllerActivity extends Activity {
+// Import DeadReckoning dependencies
+import com.qualcomm.ftcrobotcontroller.opmodes.deadReckoning;
+import com.NoahR.*;
+// End DeadReckoning dependencies
+public class  FtcRobotControllerActivity extends Activity {
 
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
   private static final boolean USE_DEVICE_EMULATION = false;
@@ -102,6 +108,38 @@ public class FtcRobotControllerActivity extends Activity {
   protected FtcRobotControllerService controllerService;
 
   protected FtcEventLoop eventLoop;
+
+  // DeadReckoning additions
+  protected Boolean usingDeadReckoningOpMode = false;
+  public static AtomicReference<Boolean> usingDeadReckoningOpModeAtomicReference;
+  public FtcRobotControllerActivity(){
+    usingDeadReckoningOpModeAtomicReference = new AtomicReference<Boolean>(this.usingDeadReckoningOpMode);
+  }
+  public static void notifyUseOfDeadReckoning(){
+    usingDeadReckoningOpModeAtomicReference.set(true);
+    // Got it on our end, lets try connecting back.
+    if(deadReckoning.deadReckoningInstructionSetAtomicReference.get() == null || deadReckoning.deadReckoningGlobalInfoPacketAtomicReference.get() == null)
+    {
+      // Reference to desired objects is broken or non existent. TODO: Find safe way to abort program.
+    }
+    // Link between activity and opmode is set. Lets try transferring instructions
+
+    globalInfoPacket globalInfoPacket = new globalInfoPacket();
+    globalInfoPacket.sessionHash = 123;
+    globalInfoPacket.encoderCPR = 1120;
+    globalInfoPacket.gearRatio = 1.0f;
+    globalInfoPacket.wheelCircumference = (float)(60 * Math.PI);
+    instructionSet<instruction> instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
+    instructions.add(new instruction(1, 2, 3, 4));
+    instructions.add(new instruction(4, 3, 2, 1));
+    deadReckoning.deadReckoningObjectAtomicReference.get().ActivityTransmission(globalInfoPacket, instructions);
+  }
+  public static boolean testDeadReckoningConnection()
+  {
+    return usingDeadReckoningOpModeAtomicReference.get();
+  }
+
+  // End additions
 
   protected class RobotRestarter implements Restarter {
 
@@ -179,7 +217,6 @@ public class FtcRobotControllerActivity extends Activity {
   @Override
   protected void onStart() {
     super.onStart();
-
     // save 4MB of logcat to the SD card
     RobotLog.writeLogcatToDisk(this, 4 * 1024);
 
@@ -328,6 +365,7 @@ public class FtcRobotControllerActivity extends Activity {
 
     controllerService.setCallback(callback);
     controllerService.setupRobot(eventLoop);
+
   }
 
   private FileInputStream fileSetup() {
@@ -355,6 +393,7 @@ public class FtcRobotControllerActivity extends Activity {
   }
 
   private void requestRobotRestart() {
+
     requestRobotShutdown();
     requestRobotSetup();
   }

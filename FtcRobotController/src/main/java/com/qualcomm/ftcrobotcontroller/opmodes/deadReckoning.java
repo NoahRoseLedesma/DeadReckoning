@@ -2,6 +2,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import android.util.Log;
 
+import com.qualcomm.ftcrobotcontroller.FtcRobotControllerActivity;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
@@ -29,10 +30,28 @@ public class deadReckoning extends OpMode{
     instructionSet<instruction> instructions;
     Iterator<instruction> it;
 
+    public static AtomicReference<deadReckoning> deadReckoningObjectAtomicReference;
+    public deadReckoning(){
+        // Create public references to globalInfoPacket and instructionSet
+        deadReckoningObjectAtomicReference = new AtomicReference<deadReckoning>(this);
+    }
+    // ActivityTransmission
+    public void ActivityTransmission(globalInfoPacket newGlobalInfoPacket, instructionSet newInstructionSet)
+    {
+        this.globalInfoPacket = newGlobalInfoPacket;
+        instructions = objectToInstructionSet(newInstructionSet);
+        debugTelemetry("1", Integer.toString(globalInfoPacket.encoderCPR));
+        debugTelemetry("2", Integer.toString(instructions.size()));
+    }
 
     @Override
     public void init(){
-
+        FtcRobotControllerActivity.notifyUseOfDeadReckoning();
+        if(!FtcRobotControllerActivity.testDeadReckoningConnection()){
+            //Cant establish a connection to the service. Abort
+            //TODO: Find a safe way to abort opmode.
+            telemetry.addData("0", "Could not connect to activity!");
+        }
         //mapHardware();
     }
 
@@ -53,14 +72,13 @@ public class deadReckoning extends OpMode{
     @Override
     public void start()
     {
-        emulateActivitySide();
 
-        globalInfoPacket = deserializeGlobalInfoPacket();
 
-        instructions = deserializeInstructionSet();
+        //globalInfoPacket = deserializeGlobalInfoPacket();
 
-        debugTelemetry("1", Integer.toString(globalInfoPacket.encoderCPR));
-        debugTelemetry("2", Integer.toString(instructions.size()));
+        //instructions = deserializeInstructionSet();
+
+
 
         if(instructions == null || globalInfoPacket == null) {
             stop(); // Does this even work?
@@ -263,5 +281,27 @@ public class deadReckoning extends OpMode{
             desearializedGlobalInfoPacket = null;
         }
         return desearializedGlobalInfoPacket;
+    }
+    instructionSet<instruction> objectToInstructionSet(Object obj)
+    {
+        instructionSet<instruction> returnSet = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
+        if (obj instanceof instructionSet<?>) {
+            // Get the List.
+            instructionSet<?> al = (instructionSet<?>) obj;
+            if (al.size() > 0) {
+                // Iterate.
+                for (int i = 0; i < al.size(); i++) {
+                    // Still not enough for a type.
+                    Object o = al.get(0);
+                    if (o instanceof instruction) {
+                        // Here we go!
+                        instruction v = (instruction) o;
+                        // use v.
+                        returnSet.add(v);
+                    }
+                }
+            }
+        }
+        return returnSet;
     }
 }
