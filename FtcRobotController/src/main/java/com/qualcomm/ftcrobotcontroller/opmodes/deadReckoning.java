@@ -7,11 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.NoahR.*;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Iterator;
 
@@ -32,14 +27,13 @@ public class deadReckoning extends OpMode{
 
     public static AtomicReference<deadReckoning> deadReckoningObjectAtomicReference;
     public deadReckoning(){
-        // Create public references to globalInfoPacket and instructionSet
+        // Create public references to object being created.
         deadReckoningObjectAtomicReference = new AtomicReference<deadReckoning>(this);
     }
     // ActivityTransmission
-    public void ActivityTransmission(globalInfoPacket newGlobalInfoPacket, instructionSet newInstructionSet)
+    public void ActivityTransmission(instructionSet newInstructionSet)
     {
-        this.globalInfoPacket = newGlobalInfoPacket;
-        instructions = objectToInstructionSet(newInstructionSet);
+        this.instructions = objectToInstructionSet(newInstructionSet);
         debugTelemetry("1", Integer.toString(globalInfoPacket.encoderCPR));
         debugTelemetry("2", Integer.toString(instructions.size()));
     }
@@ -167,124 +161,11 @@ public class deadReckoning extends OpMode{
         }
         telemetry.addData(id, text);
     }
-    void emulateActivitySide()
-    {
-        globalInfoPacket = new globalInfoPacket();
-        globalInfoPacket.sessionHash = 123;
-        globalInfoPacket.encoderCPR = 1120;
-        globalInfoPacket.gearRatio = 1.0f;
-        globalInfoPacket.wheelCircumference = (float)(60 * Math.PI);
-        instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
-        instructions.add(new instruction(1, 2, 3, 4));
-        instructions.add(new instruction(4,3,2,1));
-        serializeInstructionSet(instructions);
-        serializeGlobalInfoPacket(globalInfoPacket);
-        instructions = null;
-        globalInfoPacket = null;
-    }
 
-    void serializeInstructionSet(instructionSet set)
-    {
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile()+"instruction.packet");
-            ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
-            out.writeObject(set);
-            out.close();
-            fileOutputStream.close();
-        }
-        catch (IOException io){
-            debugTelemetry("4", "Fuckshitshitfuck");
-            stop();
-        }
-    }
-    instructionSet<instruction> deserializeInstructionSet()
-    {
-        instructionSet<instruction> desearializedInstructionSet = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
-        try {
-            FileInputStream fileInputStream = new FileInputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile()+"instruction.packet");
-            ObjectInputStream in = new ObjectInputStream(fileInputStream);
-            // desearializedInstructionSet = (instructionSet<instruction>) in.readObject();
-            // Thanks Elliott Frisch from StackOverflow
-            Object obj = in.readObject();
-            // Check it's an ArrayList
-            if (obj instanceof instructionSet<?>) {
-                // Get the List.
-                instructionSet<?> al = (instructionSet<?>) obj;
-                if (al.size() > 0) {
-                    // Iterate.
-                    for (int i = 0; i < al.size(); i++) {
-                        // Still not enough for a type.
-                        Object o = al.get(0);
-                        if (o instanceof instruction) {
-                            // Here we go!
-                            instruction v = (instruction) o;
-                            // use v.
-                            desearializedInstructionSet.add(v);
-                        }
-                    }
-                }
-            }
-            in.close();
-            fileInputStream.close();
-        }
-
-        catch (IOException io){
-            telemetry.addData("3", "IOError in deserialization");
-            for(int i = 0; i < io.getStackTrace().length; i++)
-            {
-                Log.i("Shit broke", io.getStackTrace()[i].toString());
-            }
-            stop();
-            desearializedInstructionSet = null;
-        }
-        catch (ClassNotFoundException baderror)
-        {
-            telemetry.addData("3", "ClassNotFoundException in deserialization");
-            stop();
-            desearializedInstructionSet = null;
-        }
-        return desearializedInstructionSet;
-    }
-
-    void serializeGlobalInfoPacket(globalInfoPacket globalInfoPacket)
-    {
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile()+"global.packet");
-            ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
-            out.writeObject(globalInfoPacket);
-            out.close();
-            fileOutputStream.close();
-        }
-        catch (IOException io){
-            stop();
-        }
-    }
-    globalInfoPacket deserializeGlobalInfoPacket()
-    {
-        globalInfoPacket desearializedGlobalInfoPacket;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(hardwareMap.appContext.getFilesDir().getAbsoluteFile() + "global.packet");
-            ObjectInputStream in = new ObjectInputStream(fileInputStream);
-            desearializedGlobalInfoPacket = (globalInfoPacket) in.readObject();
-            in.close();
-            fileInputStream.close();
-        }
-        catch (IOException io){
-            telemetry.addData("1", "IOError in deserialization");
-            stop();
-            desearializedGlobalInfoPacket = null;
-        }
-        catch (ClassNotFoundException baderror)
-        {
-            telemetry.addData("1", "ClassNotFoundException in deserialization");
-            stop();
-            desearializedGlobalInfoPacket = null;
-        }
-        return desearializedGlobalInfoPacket;
-    }
     instructionSet<instruction> objectToInstructionSet(Object obj)
     {
-        instructionSet<instruction> returnSet = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
+        globalInfoPacket extractedGlobalInfo = null;
+        instructionSet<instruction> returnSet = new instructionSet<instruction>();
         if (obj instanceof instructionSet<?>) {
             // Get the List.
             instructionSet<?> al = (instructionSet<?>) obj;
@@ -301,6 +182,10 @@ public class deadReckoning extends OpMode{
                     }
                 }
             }
+             extractedGlobalInfo = ((instructionSet) obj).globalInfoPacket;
+        }
+        if(extractedGlobalInfo != null) {
+            returnSet.globalInfoPacket = extractedGlobalInfo;
         }
         return returnSet;
     }

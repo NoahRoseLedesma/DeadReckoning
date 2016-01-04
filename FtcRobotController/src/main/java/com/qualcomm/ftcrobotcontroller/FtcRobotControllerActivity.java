@@ -118,21 +118,20 @@ public class  FtcRobotControllerActivity extends Activity {
   public static void notifyUseOfDeadReckoning(){
     usingDeadReckoningOpModeAtomicReference.set(true);
     // Got it on our end, lets try connecting back.
-    if(deadReckoning.deadReckoningInstructionSetAtomicReference.get() == null || deadReckoning.deadReckoningGlobalInfoPacketAtomicReference.get() == null)
+    if(deadReckoning.deadReckoningObjectAtomicReference.get() != null)
     {
-      // Reference to desired objects is broken or non existent. TODO: Find safe way to abort program.
+      // Reference to desired object is broken or non existent. TODO: Find safe way to abort program.
     }
     // Link between activity and opmode is set. Lets try transferring instructions
 
-    globalInfoPacket globalInfoPacket = new globalInfoPacket();
-    globalInfoPacket.sessionHash = 123;
-    globalInfoPacket.encoderCPR = 1120;
-    globalInfoPacket.gearRatio = 1.0f;
-    globalInfoPacket.wheelCircumference = (float)(60 * Math.PI);
-    instructionSet<instruction> instructions = new instructionSet<instruction>(new AtomicReference<com.NoahR.globalInfoPacket>(globalInfoPacket));
+    instructionSet<instruction> instructions = new instructionSet<instruction>();
+    instructions.globalInfoPacket.setEncoderCPR(1120);
+    instructions.globalInfoPacket.setGearRatio(1.0f);
+    instructions.globalInfoPacket.setWheelCircumference((float)(60 * Math.PI));
+
     instructions.add(new instruction(1, 2, 3, 4));
     instructions.add(new instruction(4, 3, 2, 1));
-    deadReckoning.deadReckoningObjectAtomicReference.get().ActivityTransmission(globalInfoPacket, instructions);
+    deadReckoning.deadReckoningObjectAtomicReference.get().ActivityTransmission(instructions);
   }
   public static boolean testDeadReckoningConnection()
   {
