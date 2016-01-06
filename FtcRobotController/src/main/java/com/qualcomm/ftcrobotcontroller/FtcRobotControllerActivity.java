@@ -49,6 +49,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -72,6 +73,7 @@ import com.qualcomm.robotcore.wifi.WifiDirectAssistant;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 // Import DeadReckoning dependencies
@@ -93,6 +95,7 @@ public class  FtcRobotControllerActivity extends Activity {
   private Utility utility;
   protected ImageButton buttonMenu;
 
+  protected ExpandableListView deadPanel;
   protected TextView textDeviceName;
   protected TextView textWifiDirectStatus;
   protected TextView textRobotStatus;
@@ -112,8 +115,13 @@ public class  FtcRobotControllerActivity extends Activity {
   // DeadReckoning additions
   protected Boolean usingDeadReckoningOpMode = false;
   public static AtomicReference<Boolean> usingDeadReckoningOpModeAtomicReference;
+
+  protected ArrayList<View> instructionUi;
+
   public FtcRobotControllerActivity(){
     usingDeadReckoningOpModeAtomicReference = new AtomicReference<Boolean>(this.usingDeadReckoningOpMode);
+    // Instantiate ArrayList
+    instructionUi = new ArrayList<View>();
   }
   public static void notifyUseOfDeadReckoning(){
     usingDeadReckoningOpModeAtomicReference.set(true);
@@ -170,6 +178,7 @@ public class  FtcRobotControllerActivity extends Activity {
     }
   }
 
+  protected TextView testTextView;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -186,7 +195,10 @@ public class  FtcRobotControllerActivity extends Activity {
         openOptionsMenu();
       }
     });
+    // Here is where I should set my listeners
+    deadPanel = new ExpandableListView(context);
 
+    
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textWifiDirectStatus = (TextView) findViewById(R.id.textWifiDirectStatus);
     textRobotStatus = (TextView) findViewById(R.id.textRobotStatus);
