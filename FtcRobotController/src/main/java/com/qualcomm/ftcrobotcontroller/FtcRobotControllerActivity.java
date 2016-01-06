@@ -74,6 +74,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 // Import DeadReckoning dependencies
@@ -116,12 +118,30 @@ public class  FtcRobotControllerActivity extends Activity {
   protected Boolean usingDeadReckoningOpMode = false;
   public static AtomicReference<Boolean> usingDeadReckoningOpModeAtomicReference;
 
-  protected ArrayList<View> instructionUi;
+  ExpandableListAdapter listAdapter;
+  ExpandableListView expListView;
+  List<String> listDataHeader;
+  HashMap<String, List<String>> listDataChild;
+
+  private void prepareListData() {
+    listDataHeader = new ArrayList<String>();
+    listDataChild = new HashMap<String, List<String>>();
+
+    // Adding child data
+    listDataHeader.add("Dead Reckoning");
+
+    // Adding child data
+    List<String> deadInstructions = new ArrayList<String>();
+    deadInstructions.add("Example one");
+    deadInstructions.add("Example two");
+
+
+    listDataChild.put(listDataHeader.get(0), deadInstructions);
+  }
 
   public FtcRobotControllerActivity(){
     usingDeadReckoningOpModeAtomicReference = new AtomicReference<Boolean>(this.usingDeadReckoningOpMode);
     // Instantiate ArrayList
-    instructionUi = new ArrayList<View>();
   }
   public static void notifyUseOfDeadReckoning(){
     usingDeadReckoningOpModeAtomicReference.set(true);
@@ -145,6 +165,7 @@ public class  FtcRobotControllerActivity extends Activity {
   {
     return usingDeadReckoningOpModeAtomicReference.get();
   }
+
 
   // End additions
 
@@ -198,7 +219,7 @@ public class  FtcRobotControllerActivity extends Activity {
     // Here is where I should set my listeners
     deadPanel = new ExpandableListView(context);
 
-    
+
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textWifiDirectStatus = (TextView) findViewById(R.id.textWifiDirectStatus);
     textRobotStatus = (TextView) findViewById(R.id.textRobotStatus);
@@ -223,6 +244,32 @@ public class  FtcRobotControllerActivity extends Activity {
     hittingMenuButtonBrightensScreen();
 
     if (USE_DEVICE_EMULATION) { HardwareFactory.enableDeviceEmulation(); }
+
+    // Expandable List
+    // get the listview
+    expListView = (ExpandableListView) findViewById(R.id.deadList);
+
+    // preparing list data
+    prepareListData();
+
+    listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+
+    // setting list adapter
+    expListView.setAdapter(listAdapter);
+
+    // Listview on child click listener
+    expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+      @Override
+      public boolean onChildClick(ExpandableListView parent, View v,
+                                  int groupPosition, int childPosition, long id) {
+
+        // This should open a little window that will let you edit values~!
+        startActivity(new Intent(FtcRobotControllerActivity.this, InstructionEdit.class));
+        
+        return false;
+      }
+    });
   }
 
   @Override
