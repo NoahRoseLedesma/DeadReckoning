@@ -49,6 +49,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -117,11 +118,15 @@ public class  FtcRobotControllerActivity extends Activity {
   // DeadReckoning additions
   protected Boolean usingDeadReckoningOpMode = false;
   public static AtomicReference<Boolean> usingDeadReckoningOpModeAtomicReference;
+  public static AtomicReference<FtcRobotControllerActivity> activityAtomicReference;
+  instructionSet<instruction> instructions = new instructionSet<instruction>();
+
 
   ExpandableListAdapter listAdapter;
   ExpandableListView expListView;
   List<String> listDataHeader;
   HashMap<String, List<String>> listDataChild;
+  Button addButton;
 
   private void prepareListData() {
     listDataHeader = new ArrayList<String>();
@@ -132,16 +137,30 @@ public class  FtcRobotControllerActivity extends Activity {
 
     // Adding child data
     List<String> deadInstructions = new ArrayList<String>();
-    deadInstructions.add("Example one");
-    deadInstructions.add("Example two");
-
+    for (int i = 0; i < instructions.size(); i++) {
+      deadInstructions.add("Instruction #" + (i + 1));
+    }
 
     listDataChild.put(listDataHeader.get(0), deadInstructions);
   }
 
   public FtcRobotControllerActivity(){
     usingDeadReckoningOpModeAtomicReference = new AtomicReference<Boolean>(this.usingDeadReckoningOpMode);
+    activityAtomicReference = new AtomicReference<FtcRobotControllerActivity>(this);
     // Instantiate ArrayList
+    instructions.add(new instruction(1, 2, 3, 4));
+    instructions.add(new instruction(4, 3, 2, 1));
+  }
+  public void setInstruction(int position, instruction object)
+  {
+    if(object != null) {
+      instructions.set(position, object);
+    }
+    else {
+      instructions.remove(position);
+
+      refreshList();
+    }
   }
   public static void notifyUseOfDeadReckoning(){
     usingDeadReckoningOpModeAtomicReference.set(true);
@@ -218,7 +237,7 @@ public class  FtcRobotControllerActivity extends Activity {
     });
     // Here is where I should set my listeners
     deadPanel = new ExpandableListView(context);
-
+    addButton = (Button)findViewById(R.id.addButton);
 
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textWifiDirectStatus = (TextView) findViewById(R.id.textWifiDirectStatus);
@@ -265,13 +284,26 @@ public class  FtcRobotControllerActivity extends Activity {
                                   int groupPosition, int childPosition, long id) {
 
         // This should open a little window that will let you edit values~!
+        InstructionEdit.instructionNumber = childPosition;
+        InstructionEdit.editingInstruction = instructions.get(childPosition);
         startActivity(new Intent(FtcRobotControllerActivity.this, InstructionEdit.class));
-        
         return false;
+      }
+    });
+    addButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        instructions.add(new instruction(0, 0, 0, 0));
+        refreshList();
       }
     });
   }
 
+  protected void refreshList(){
+    prepareListData();
+    listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+    expListView.setAdapter(listAdapter);
+  }
   @Override
   protected void onStart() {
     super.onStart();

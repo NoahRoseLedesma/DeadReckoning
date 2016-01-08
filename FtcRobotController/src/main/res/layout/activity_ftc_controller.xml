@@ -156,5 +156,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:layout_below="@+id/textErrorMessage"
         android:layout_above="@+id/textGamepad1" />
 
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:id="@+id/addButton"
+        android:layout_alignTop="@+id/textOpMode"
+        android:layout_alignRight="@+id/textOpMode"
+        android:layout_alignEnd="@+id/textOpMode" />
+
   </RelativeLayout>
 </LinearLayout>
