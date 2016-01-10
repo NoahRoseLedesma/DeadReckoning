@@ -88,6 +88,9 @@
     <activity
         android:name=".InstructionEdit">
     </activity>
+    <activity
+        android:name=".motorEdit">
+    </activity>
   </application>
 
 </manifest>

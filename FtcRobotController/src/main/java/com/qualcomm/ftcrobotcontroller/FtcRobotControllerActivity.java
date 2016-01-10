@@ -141,7 +141,11 @@ public class  FtcRobotControllerActivity extends Activity {
       deadInstructions.add("Instruction #" + (i + 1));
     }
 
+    List<String> motorInfo = new ArrayList<String>();
+    listDataHeader.add("Motors");
+    motorInfo.add("Motor Info");
     listDataChild.put(listDataHeader.get(0), deadInstructions);
+    listDataChild.put(listDataHeader.get(1), motorInfo);
   }
 
   public FtcRobotControllerActivity(){
@@ -161,6 +165,10 @@ public class  FtcRobotControllerActivity extends Activity {
 
       refreshList();
     }
+  }
+  public void setGlobalInfo(globalInfoPacket globalInfo)
+  {
+    instructions.globalInfoPacket = globalInfo;
   }
   public static void notifyUseOfDeadReckoning(){
     usingDeadReckoningOpModeAtomicReference.set(true);
@@ -282,11 +290,18 @@ public class  FtcRobotControllerActivity extends Activity {
       @Override
       public boolean onChildClick(ExpandableListView parent, View v,
                                   int groupPosition, int childPosition, long id) {
-
-        // This should open a little window that will let you edit values~!
-        InstructionEdit.instructionNumber = childPosition;
-        InstructionEdit.editingInstruction = instructions.get(childPosition);
-        startActivity(new Intent(FtcRobotControllerActivity.this, InstructionEdit.class));
+        if(groupPosition == 0) {
+          // This should open a little window that will let you edit values
+          InstructionEdit.instructionNumber = childPosition;
+          InstructionEdit.editingInstruction = instructions.get(childPosition);
+          startActivity(new Intent(FtcRobotControllerActivity.this, InstructionEdit.class));
+        }
+        if(groupPosition == 1)
+        {
+          //This should open a little window that will let you edit motor info.
+          motorEdit.editingGlobalInfoPacket = instructions.globalInfoPacket;
+          startActivity(new Intent(FtcRobotControllerActivity.this, motorEdit.class));
+        }
         return false;
       }
     });
@@ -303,6 +318,7 @@ public class  FtcRobotControllerActivity extends Activity {
     prepareListData();
     listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
     expListView.setAdapter(listAdapter);
+    expListView.expandGroup(0);
   }
   @Override
   protected void onStart() {

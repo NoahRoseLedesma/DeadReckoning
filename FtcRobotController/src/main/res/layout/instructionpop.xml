@@ -23,7 +23,7 @@
             android:ems="10"
             android:id="@+id/motor1"
             android:text="distance"
-            android:layout_below="@+id/textView"
+            android:layout_below="@+id/title"
             android:layout_alignLeft="@+id/motor3"
             android:layout_alignStart="@+id/motor3" />
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Motor #1"
-            android:id="@+id/textView"
+            android:id="@+id/title"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="52dp" />
@@ -56,8 +56,8 @@
             android:id="@+id/textView2"
             android:layout_marginTop="41dp"
             android:layout_below="@+id/motor1"
-            android:layout_alignLeft="@+id/textView"
-            android:layout_alignStart="@+id/textView" />
+            android:layout_alignLeft="@+id/title"
+            android:layout_alignStart="@+id/title" />
 
         <EditText
             android:layout_width="wrap_content"
