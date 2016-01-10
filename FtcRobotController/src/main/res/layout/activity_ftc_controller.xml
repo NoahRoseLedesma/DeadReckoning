@@ -166,5 +166,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         android:layout_alignRight="@+id/textOpMode"
         android:layout_alignEnd="@+id/textOpMode" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Run"
+        android:id="@+id/runButton"
+        android:layout_below="@+id/textGamepad1"
+        android:layout_centerHorizontal="true" />
+
   </RelativeLayout>
 </LinearLayout>

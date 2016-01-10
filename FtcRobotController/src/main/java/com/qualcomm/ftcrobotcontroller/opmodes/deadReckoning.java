@@ -20,7 +20,6 @@ public class deadReckoning extends OpMode{
     int instructionCount;
     DcMotorController motorController, motorController2;
     DcMotor motorFR, motorFL, motorBR, motorBL;
-    globalInfoPacket globalInfoPacket;
     instruction currentInstruction;
     instructionSet<instruction> instructions;
     Iterator<instruction> it;
@@ -34,7 +33,7 @@ public class deadReckoning extends OpMode{
     public void ActivityTransmission(instructionSet newInstructionSet)
     {
         this.instructions = objectToInstructionSet(newInstructionSet);
-        debugTelemetry("1", Integer.toString(globalInfoPacket.encoderCPR));
+        debugTelemetry("1", Integer.toString(instructions.globalInfoPacket.encoderCPR));
         debugTelemetry("2", Integer.toString(instructions.size()));
     }
 
@@ -74,7 +73,7 @@ public class deadReckoning extends OpMode{
 
 
 
-        if(instructions == null || globalInfoPacket == null) {
+        if(instructions == null || instructions.globalInfoPacket == null) {
             stop(); // Does this even work?
             return;
         }
@@ -121,11 +120,11 @@ public class deadReckoning extends OpMode{
         motorBL.setPower(0.5);
     }
     int calculateRotations(int distance){
-        if(globalInfoPacket.encoderCPR == 0 || globalInfoPacket.gearRatio == 0.0f || globalInfoPacket.wheelCircumference == 0.0f){
+        if(instructions.globalInfoPacket.encoderCPR == 0 || instructions.globalInfoPacket.gearRatio == 0.0f || instructions.globalInfoPacket.wheelCircumference == 0.0f){
             //Something has broke. Handle the error
             return 0;
         }
-        return (int)(globalInfoPacket.encoderCPR * (distance / globalInfoPacket.wheelCircumference) * globalInfoPacket.gearRatio);
+        return (int)(instructions.globalInfoPacket.encoderCPR * (distance / instructions.globalInfoPacket.wheelCircumference) * instructions.globalInfoPacket.gearRatio);
     }
     private void mapHardware()
     {

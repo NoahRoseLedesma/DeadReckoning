@@ -126,7 +126,8 @@ public class  FtcRobotControllerActivity extends Activity {
   ExpandableListView expListView;
   List<String> listDataHeader;
   HashMap<String, List<String>> listDataChild;
-  Button addButton;
+  protected Button addButton;
+  protected Button runButton;
 
   private void prepareListData() {
     listDataHeader = new ArrayList<String>();
@@ -151,9 +152,6 @@ public class  FtcRobotControllerActivity extends Activity {
   public FtcRobotControllerActivity(){
     usingDeadReckoningOpModeAtomicReference = new AtomicReference<Boolean>(this.usingDeadReckoningOpMode);
     activityAtomicReference = new AtomicReference<FtcRobotControllerActivity>(this);
-    // Instantiate ArrayList
-    instructions.add(new instruction(1, 2, 3, 4));
-    instructions.add(new instruction(4, 3, 2, 1));
   }
   public void setInstruction(int position, instruction object)
   {
@@ -180,13 +178,6 @@ public class  FtcRobotControllerActivity extends Activity {
     // Link between activity and opmode is set. Lets try transferring instructions
 
     instructionSet<instruction> instructions = new instructionSet<instruction>();
-    instructions.globalInfoPacket.setEncoderCPR(1120);
-    instructions.globalInfoPacket.setGearRatio(1.0f);
-    instructions.globalInfoPacket.setWheelCircumference((float)(60 * Math.PI));
-
-    instructions.add(new instruction(1, 2, 3, 4));
-    instructions.add(new instruction(4, 3, 2, 1));
-    deadReckoning.deadReckoningObjectAtomicReference.get().ActivityTransmission(instructions);
   }
   public static boolean testDeadReckoningConnection()
   {
@@ -243,9 +234,9 @@ public class  FtcRobotControllerActivity extends Activity {
         openOptionsMenu();
       }
     });
-    // Here is where I should set my listeners
     deadPanel = new ExpandableListView(context);
     addButton = (Button)findViewById(R.id.addButton);
+    runButton = (Button)findViewById(R.id.runButton);
 
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textWifiDirectStatus = (TextView) findViewById(R.id.textWifiDirectStatus);
@@ -310,6 +301,19 @@ public class  FtcRobotControllerActivity extends Activity {
       public void onClick(View v) {
         instructions.add(new instruction(0, 0, 0, 0));
         refreshList();
+      }
+    });
+    runButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if(usingDeadReckoningOpModeAtomicReference.get())
+        {
+          deadReckoning.deadReckoningObjectAtomicReference.get().ActivityTransmission(instructions);
+        }
+        else
+        {
+          Toast.makeText(context, "Dead Reckoning opmode not selected!", Toast.LENGTH_SHORT).show();
+        }
       }
     });
   }
