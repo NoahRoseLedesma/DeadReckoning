@@ -94,38 +94,17 @@ public class deadReckoning extends OpMode{
         instructionCount++;
         debugTelemetry("1", Integer.toString(instructionCount));
         // Reset encoders
-        motorFR.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motorFL.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motorBR.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
-        motorBL.setChannelMode(DcMotorController.RunMode.RESET_ENCODERS);
+
         // Set target
-        motorFR.setTargetPosition(calculateRotations(instruction.motorFRDest));
-        motorFL.setTargetPosition(calculateRotations(instruction.motorFLDest));
-        motorBR.setTargetPosition(calculateRotations(instruction.motorBRDest));
-        motorBL.setTargetPosition(calculateRotations(instruction.motorBLDest));
+
         // Run to position
-        motorFR.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorFL.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorBR.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        motorBL.setChannelMode(DcMotorController.RunMode.RUN_TO_POSITION);
+
         // Run with encoders
-        motorFR.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        motorFL.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        motorBR.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        motorBL.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
         // Set motor power (.5 for test)
-        motorFR.setPower(0.5);
-        motorFL.setPower(0.5);
-        motorBR.setPower(0.5);
-        motorBL.setPower(0.5);
+
     }
-    int calculateRotations(int distance){
-        if(instructions.globalInfoPacket.encoderCPR == 0 || instructions.globalInfoPacket.gearRatio == 0.0f || instructions.globalInfoPacket.wheelCircumference == 0.0f){
-            //Something has broke. Handle the error
-            return 0;
-        }
-        return (int)(instructions.globalInfoPacket.encoderCPR * (distance / instructions.globalInfoPacket.wheelCircumference) * instructions.globalInfoPacket.gearRatio);
-    }
+
     private void mapHardware()
     {
         motorController = hardwareMap.dcMotorController.get("Motor Controller 1");
